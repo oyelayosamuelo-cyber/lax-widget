@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <title>LAX Script Panel</title>
-<script src="https://live.zwidgets.com/js-sdk/1.0.9/ZohoEmbededAppSDK.min.js"></script>
+<script src="https://js.zohostatic.com/zohocrm/widgets/v1.0/zohocrmsdk.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Georgia, serif; background: #0f0f0f; color: #e8e0d0; font-size: 13px; padding: 16px; }
@@ -91,17 +91,13 @@ function initWidget() {
   ZOHO.embeddedApp.init();
 }
 
-if (window.ZOHO && ZOHO.embeddedApp) {
-  initWidget();
-} else {
-  document.addEventListener("DOMContentLoaded", function() {
-    if (window.ZOHO && ZOHO.embeddedApp) {
-      initWidget();
-    } else {
-      showError("Zoho SDK not loaded. Open this page from inside a Zoho CRM Lead record.");
-    }
-  });
-}
+window.addEventListener("load", function() {
+  if (window.ZOHO && window.ZOHO.embeddedApp) {
+    initWidget();
+  } else {
+    showError("Zoho SDK not loaded — check network or contact admin.");
+  }
+});
 
 function v(val) { return '<span class="val">' + (val || "—") + "</span>"; }
 
