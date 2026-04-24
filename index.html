@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <title>LAX Script Panel</title>
-<script src="https://js.zohostatic.com/zohocrm/widgets/v1.0/zohocrmsdk.min.js"></script>
+<script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Georgia, serif; background: #0f0f0f; color: #e8e0d0; font-size: 13px; padding: 16px; }
@@ -91,13 +91,23 @@ function initWidget() {
   ZOHO.embeddedApp.init();
 }
 
-window.addEventListener("load", function() {
-  if (window.ZOHO && window.ZOHO.embeddedApp) {
-    initWidget();
-  } else {
-    showError("Zoho SDK not loaded — check network or contact admin.");
-  }
+ZOHO.embeddedApp.on("PageLoad", function(data) {
+  try {
+    var recordId = data.EntityId;
+    var entity   = data.Entity || "Leads";
+    if (!recordId) { showError("No record ID. Raw data: " + JSON.stringify(data)); return; }
+    ZOHO.CRM.API.getRecord({ Entity: entity, RecordID: recordId })
+      .then(function(res) {
+        if (res && res.data && res.data.length > 0) {
+          renderPanel(res.data[0]);
+        } else {
+          showError("No data returned. Response: " + JSON.stringify(res));
+        }
+      })
+      .catch(function(err) { showError("API error: " + JSON.stringify(err)); });
+  } catch(ex) { showError("Error: " + ex.message); }
 });
+ZOHO.embeddedApp.init();
 
 function v(val) { return '<span class="val">' + (val || "—") + "</span>"; }
 
