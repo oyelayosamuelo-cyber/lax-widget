@@ -6,44 +6,44 @@
 <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: Georgia, serif; background: #0f0f0f; color: #e8e0d0; font-size: 13px; padding: 16px; }
-.lead-name { font-size: 17px; font-weight: bold; color: #e8d8a0; margin-bottom: 6px; }
+body { font-family: Georgia, serif; background: #f9f7f4; color: #2a1f14; font-size: 13px; padding: 16px; }
+.lead-name { font-size: 18px; font-weight: bold; color: #1a1008; margin-bottom: 6px; }
 .badge { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; padding: 3px 10px; border-radius: 3px; text-transform: uppercase; display: inline-block; margin-bottom: 12px; }
-.badge-lax    { background: #1a2a3a; color: #6ab0f5; border: 1px solid #2a4a6a; }
-.badge-ii     { background: #1a2a1a; color: #6af5a0; border: 1px solid #2a5a2a; }
-.badge-booked { background: #2a1a0a; color: #f5b06a; border: 1px solid #5a3a1a; }
-.badge-unknown{ background: #2a2a2a; color: #999;    border: 1px solid #444; }
+.badge-lax    { background: #ddeeff; color: #1a4a8a; border: 1px solid #aaccee; }
+.badge-ii     { background: #ddfff0; color: #0a5a30; border: 1px solid #aaeedd; }
+.badge-booked { background: #fff3dd; color: #8a4a00; border: 1px solid #eeccaa; }
+.badge-unknown{ background: #f0f0f0; color: #666;    border: 1px solid #ccc; }
 .urgency-row  { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
-.urgency-label{ font-size:10px; letter-spacing:1px; color:#6a5a4a; text-transform:uppercase; }
+.urgency-label{ font-size:10px; letter-spacing:1px; color:#8a7a6a; text-transform:uppercase; }
 .urgency-pill { font-size:10px; font-weight:bold; padding:3px 10px; border-radius:10px; text-transform:uppercase; }
-.HOT    { background:#3a0a0a; color:#f56a6a; border:1px solid #7a2a2a; }
-.WARM   { background:#3a2a0a; color:#f5c06a; border:1px solid #7a5a2a; }
-.MEDIUM { background:#2a2a0a; color:#f5f06a; border:1px solid #5a5a2a; }
-.COOL   { background:#1a1a2a; color:#8a8ab0; border:1px solid #3a3a5a; }
+.HOT    { background:#ffe0e0; color:#8a0000; border:1px solid #ffaaaa; }
+.WARM   { background:#fff3e0; color:#8a4a00; border:1px solid #ffccaa; }
+.MEDIUM { background:#fffde0; color:#6a6a00; border:1px solid #eeee99; }
+.COOL   { background:#eeeeff; color:#3a3a8a; border:1px solid #ccccee; }
 .chips  { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
-.chip   { background:#1a1a1a; border:1px solid #2a2a2a; padding:3px 10px; border-radius:4px; font-size:11px; color:#a89878; }
-.chip span { color:#6a5a4a; margin-right:4px; }
+.chip   { background:#fff; border:1px solid #ddd; padding:3px 10px; border-radius:4px; font-size:11px; color:#4a3a2a; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+.chip span { color:#9a8a7a; margin-right:4px; }
 .tabs   { display:flex; gap:2px; margin-bottom:0; }
-.tab    { padding:6px 14px; font-size:10px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; background:#1a1a1a; color:#5a4a3a; border:1px solid #2a2a2a; border-bottom:none; border-radius:4px 4px 0 0; }
-.tab.active { background:#2a2010; color:#c8a860; border-color:#4a3a1a; }
-.tab-body { background:#141414; border:1px solid #2a2010; border-radius:0 4px 4px 4px; padding:14px; min-height:180px; }
-.script-box { border-left:3px solid #8a6a3a; padding:10px 14px; background:#1a1208; border-radius:0 4px 4px 0; line-height:1.8; color:#c8b89a; font-size:13px; }
-.gap-box    { border-left:3px solid #3a6a3a; padding:10px 14px; background:#0a1a0a; border-radius:0 4px 4px 0; margin-top:10px; line-height:1.8; color:#a8c8a8; font-size:12px; }
-.obj { background:#1a1010; border:1px solid #2a1a1a; border-radius:4px; margin-bottom:6px; }
-.obj-q { padding:8px 12px; color:#c86a6a; font-size:11px; font-style:italic; cursor:pointer; }
-.obj-a { padding:8px 12px 12px; border-top:1px solid #2a1a1a; color:#c8a898; font-size:12px; line-height:1.7; display:none; }
+.tab    { padding:6px 14px; font-size:10px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; background:#ede9e4; color:#8a7a6a; border:1px solid #d0c8c0; border-bottom:none; border-radius:4px 4px 0 0; }
+.tab.active { background:#fff; color:#8a5a1a; border-color:#c8a860; font-weight:bold; }
+.tab-body { background:#fff; border:1px solid #c8a860; border-radius:0 4px 4px 4px; padding:16px; min-height:180px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.script-box { border-left:4px solid #c8a860; padding:12px 16px; background:#fffdf7; border-radius:0 4px 4px 0; line-height:1.9; color:#2a1f14; font-size:13px; }
+.gap-box    { border-left:4px solid #5a9a5a; padding:12px 16px; background:#f4fff4; border-radius:0 4px 4px 0; margin-top:10px; line-height:1.8; color:#1a4a1a; font-size:12px; }
+.obj { background:#fafafa; border:1px solid #e8e0d8; border-radius:4px; margin-bottom:6px; }
+.obj-q { padding:8px 12px; color:#8a3030; font-size:11px; font-style:italic; cursor:pointer; display:flex; justify-content:space-between; }
+.obj-a { padding:8px 12px 12px; border-top:1px solid #e8e0d8; color:#3a2a1a; font-size:12px; line-height:1.8; display:none; background:#fff; }
 .obj-a.open { display:block; }
-.section-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#6a5a4a; margin-bottom:8px; }
-.val { background:#2a1a08; color:#f5b06a; padding:1px 5px; border-radius:3px; font-family:monospace; font-size:12px; }
-.no-script { background:#1a1010; border:1px solid #3a1a1a; border-radius:4px; padding:16px; color:#c87070; text-align:center; line-height:1.8; }
+.section-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#9a8a7a; margin-bottom:10px; font-weight:bold; }
+.val { background:#fff3dd; color:#8a4a00; padding:1px 6px; border-radius:3px; font-family:monospace; font-size:12px; border:1px solid #eeccaa; }
+.no-script { background:#fff8f8; border:1px solid #f0cccc; border-radius:4px; padding:16px; color:#8a3030; text-align:center; line-height:1.8; }
 ul.checklist { list-style:none; }
-ul.checklist li { padding:6px 0; border-bottom:1px dotted #1a1a1a; color:#a89878; font-size:12px; display:flex; gap:8px; }
-ul.checklist li::before { content:"○"; color:#4a3a2a; }
-.err { color:#f56a6a; font-size:12px; padding:16px; background:#1a0a0a; border:1px solid #3a1a1a; border-radius:4px; }
+ul.checklist li { padding:7px 0; border-bottom:1px dotted #e0d8d0; color:#3a2a1a; font-size:12px; display:flex; gap:8px; }
+ul.checklist li::before { content:"○"; color:#c8a860; }
+.err { color:#8a0000; font-size:12px; padding:16px; background:#fff8f8; border:1px solid #f0cccc; border-radius:4px; }
 </style>
 </head>
 <body>
-<div id="loading" style="color:#8a7a6a;letter-spacing:2px;padding:20px;">Loading lead data…</div>
+<div id="loading" style="color:#8a7a6a;letter-spacing:2px;padding:20px;background:#f9f7f4;">Loading lead data…</div>
 <div id="panel" style="display:none"></div>
 <div id="error"  style="display:none"></div>
 
