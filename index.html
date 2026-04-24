@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>LAX Script Panel</title>
+<script src="https://live.zwidgets.com/js-sdk/1.0.9/ZohoEmbededAppSDK.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; background: #0f0f0f; color: #e8e0d0; font-size: 13px; padding: 16px; }
+.lead-name { font-size: 17px; font-weight: bold; color: #e8d8a0; margin-bottom: 6px; }
+.badge { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; padding: 3px 10px; border-radius: 3px; text-transform: uppercase; display: inline-block; margin-bottom: 12px; }
+.badge-lax { background: #1a2a3a; color: #6ab0f5; border: 1px solid #2a4a6a; }
+.badge-ii  { background: #1a2a1a; color: #6af5a0; border: 1px solid #2a5a2a; }
+.badge-booked { background: #2a1a0a; color: #f5b06a; border: 1px solid #5a3a1a; }
+.badge-unknown { background: #2a2a2a; color: #999; border: 1px solid #444; }
+.urgency-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.urgency-label { font-size: 10px; letter-spacing: 1px; color: #6a5a4a; text-transform: uppercase; }
+.urgency-pill { font-size: 10px; font-weight: bold; padding: 3px 10px; border-radius: 10px; text-transform: uppercase; }
+.HOT    { background:#3a0a0a; color:#f56a6a; border:1px solid #7a2a2a; }
+.WARM   { background:#3a2a0a; color:#f5c06a; border:1px solid #7a5a2a; }
+.MEDIUM { background:#2a2a0a; color:#f5f06a; border:1px solid #5a5a2a; }
+.COOL   { background:#1a1a2a; color:#8a8ab0; border:1px solid #3a3a5a; }
+.chips  { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.chip   { background:#1a1a1a; border:1px solid #2a2a2a; padding:3px 10px; border-radius:4px; font-size:11px; color:#a89878; }
+.chip span { color:#6a5a4a; margin-right:4px; }
+.tabs   { display:flex; gap:2px; margin-bottom:0; }
+.tab    { padding:6px 14px; font-size:10px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; background:#1a1a1a; color:#5a4a3a; border:1px solid #2a2a2a; border-bottom:none; border-radius:4px 4px 0 0; }
+.tab.active { background:#2a2010; color:#c8a860; border-color:#4a3a1a; }
+.tab-body { background:#141414; border:1px solid #2a2010; border-radius:0 4px 4px 4px; padding:14px; min-height:180px; }
+.script-box { border-left:3px solid #8a6a3a; padding:10px 14px; background:#1a1208; border-radius:0 4px 4px 0; line-height:1.8; color:#c8b89a; font-size:13px; }
+.gap-box    { border-left:3px solid #3a6a3a; padding:10px 14px; background:#0a1a0a; border-radius:0 4px 4px 0; margin-top:10px; line-height:1.8; color:#a8c8a8; font-size:12px; }
+.obj { background:#1a1010; border:1px solid #2a1a1a; border-radius:4px; margin-bottom:6px; }
+.obj-q { padding:8px 12px; color:#c86a6a; font-size:11px; font-style:italic; cursor:pointer; }
+.obj-a { padding:8px 12px 12px; border-top:1px solid #2a1a1a; color:#c8a898; font-size:12px; line-height:1.7; display:none; }
+.obj-a.open { display:block; }
+.section-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#6a5a4a; margin-bottom:8px; }
+.val { background:#2a1a08; color:#f5b06a; padding:1px 5px; border-radius:3px; font-family:monospace; font-size:12px; }
+.no-script { background:#1a1010; border:1px solid #3a1a1a; border-radius:4px; padding:16px; color:#c87070; text-align:center; line-height:1.8; }
+ul.checklist { list-style:none; }
+ul.checklist li { padding:6px 0; border-bottom:1px dotted #1a1a1a; color:#a89878; font-size:12px; display:flex; gap:8px; }
+ul.checklist li::before { content:"○"; color:#4a3a2a; }
+</style>
+</head>
+<body>
+
+<div id="loading" style="color:#8a7a6a;letter-spacing:2px;padding:20px;">Loading lead data…</div>
+<div id="panel" style="display:none"></div>
+
+<script>
+ZOHO.embeddedApp.on("PageLoad", function(data) {
+  var entity = data.Entity;
+  ZOHO.CRM.API.getRecord({Entity: entity, RecordID: data.EntityId})
+    .then(function(res) {
+      if(res.data && res.data.length > 0) {
+        renderPanel(res.data[0]);
+      } else {
+        document.getElementById("loading").innerHTML = "Could not load lead data.";
+      }
+    });
+});
+ZOHO.embeddedApp.init();
+
+function g(lead, field) {
+  var v = lead[field];
+  return (v === null || v === undefined) ? "" : v.toString();
+}
+
+function renderPanel(lead) {
+  var fn        = g(lead,"First_Name") || "this lead";
+  var tag       = g(lead,"Tag").toLowerCase();
+  var page      = g(lead,"Funnel_Entry_Page").toLowerCase();
+  var quizScore = g(lead,"Quiz_Composite_Score");
+  var quizGap   = g(lead,"Quiz_Gap_Dimension");
+  var gapScore  = g(lead,"Quiz_Gap_Score");
+  var concScore = g(lead,"Concentration_Score");
+  var scoreTier = g(lead,"Score_Tier");
+  var corrPct   = g(lead,"Correlated_Pct");
+  var blindSpot = g(lead,"Highest_Blind_Spot");
+  var iiScore   = g(lead,"Composite_Score");
+  var swag      = g(lead,"SWAG_Assets_Viewed").toLowerCase();
+  var laxQ6     = g(lead,"LAX_Q6_Action_Urgency").toLowerCase();
+  var iiQ9      = g(lead,"II_Q9_Action_Urgency1").toLowerCase();
+
+  var isBooked  = tag.includes("call_booked");
+  var isLAX     = tag.includes("lax_");
+  var isII      = tag.includes("tof_") || (tag.includes("quiz_complete") && !tag.includes("lax_quiz"));
+
+  var scriptType = "UNKNOWN";
+  if(isBooked)                                                      scriptType = "BOOKED_SESSION";
+  else if(page.includes("/score") || tag.includes("lax_calculator")) scriptType = "LAX_SCORER";
+  else if(page.includes("/quiz")  || tag.includes("lax_quiz"))       scriptType = "LAX_QUIZ";
+  else if(page.includes("/opportunities") || tag.includes("llax_opplist")) scriptType = "LAX_OPPLIST";
+  else if(tag.includes("quiz_complete") && isII)                    scriptType = "II_ASSESSMENT";
+  else if(tag.includes("tof_masterclass"))                          scriptType = "II_MASTERCLASS";
+  else if(tag.includes("tof_article"))                              scriptType = "II_ARTICLE";
+  else if(tag.includes("tof_advertorial"))                          scriptType = "II_ADVERTORIAL";
+
+  var urgencyAnswer = isLAX ? laxQ6 : iiQ9;
+  var urgency = "COOL";
+  if(urgencyAnswer.includes("ready now") || urgencyAnswer.includes("actively looking")) urgency = "HOT";
+  else if(urgencyAnswer.includes("few months")) urgency = "WARM";
+  else if(urgencyAnswer.includes("this year") || urgencyAnswer.includes("sometime"))    urgency = "MEDIUM";
+
+  var badgeClass = isBooked ? "badge-booked" : (isLAX ? "badge-lax" : (isII ? "badge-ii" : "badge-unknown"));
+  var badgeLabel = isBooked ? "BOOKED SESSION" : (isLAX ? "LAX LEAD" : (isII ? "II LEAD" : "UNKNOWN SOURCE"));
+
+  var html = "";
+  html += '<div class="lead-name">' + fn + '</div>';
+  html += '<span class="badge ' + badgeClass + '">' + badgeLabel + '</span>';
+
+  html += '<div class="urgency-row"><span class="urgency-label">Action Urgency</span>';
+  html += '<span class="urgency-pill ' + urgency + '">' + urgency + '</span></div>';
+
+  html += '<div class="chips">';
+  if(concScore) html += '<div class="chip"><span>Conc Score:</span>' + concScore + '</div>';
+  if(scoreTier) html += '<div class="chip"><span>Tier:</span>' + scoreTier + '</div>';
+  if(corrPct)   html += '<div class="chip"><span>Correlated:</span>' + corrPct + '%</div>';
+  if(quizScore) html += '<div class="chip"><span>Quiz Score:</span>' + quizScore + '/100</div>';
+  if(quizGap)   html += '<div class="chip"><span>Gap:</span>' + quizGap + '</div>';
+  if(blindSpot) html += '<div class="chip"><span>Blind Spot:</span>' + blindSpot + '</div>';
+  html += '</div>';
+
+  html += '<div class="tabs">';
+  html += '<div class="tab active" onclick="switchTab(this,\'opening\')">Opening</div>';
+  html += '<div class="tab" onclick="switchTab(this,\'dimension\')">Dimension</div>';
+  html += '<div class="tab" onclick="switchTab(this,\'objections\')">Objections</div>';
+  if(isBooked) html += '<div class="tab" onclick="switchTab(this,\'checklist\')">Pre-Call</div>';
+  html += '</div>';
+
+  html += '<div class="tab-body">';
+  html += '<div id="tab-opening">'  + buildOpening(scriptType,fn,quizScore,quizGap,gapScore,concScore,scoreTier,corrPct,blindSpot,swag) + '</div>';
+  html += '<div id="tab-dimension" style="display:none">' + buildDimension(quizGap||blindSpot) + '</div>';
+  html += '<div id="tab-objections" style="display:none">' + buildObjections() + '</div>';
+  if(isBooked) html += '<div id="tab-checklist" style="display:none">' + buildChecklist() + '</div>';
+  html += '</div>';
+
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("panel").innerHTML = html;
+  document.getElementById("panel").style.display = "block";
+}
+
+function v(val) { return '<span class="val">' + (val||"—") + '</span>'; }
+
+function buildOpening(type,fn,quizScore,quizGap,gapScore,concScore,scoreTier,corrPct,blindSpot,swag) {
+  var s = '<div class="section-label">Opening Script — Read Aloud</div><div class="script-box">';
+  if(type==="BOOKED_SESSION") {
+    s += '"Hi '+v(fn)+', great to meet you. This is '+v("[Your Name]")+' from <strong>London Art Exchange</strong>. Thank you for booking this in."<br><br>';
+    s += '"I\'ve had a chance to review your results ahead of this call. But I want to start by hearing from you — <strong>what prompted you to book this session? What are you hoping to get out of the next 30 minutes?</strong>"<br><br>';
+    s += '<em style="color:#6a5a4a">Let them talk first. Their answer structures the rest of the call.</em>';
+  } else if(type==="LAX_SCORER") {
+    s += '"Hi '+v(fn)+', this is '+v("[Your Name]")+' from <strong>London Art Exchange</strong>. You used our Portfolio Concentration Calculator recently and your results flagged some interesting patterns in your allocation."<br><br>';
+    s += '<em style="color:#6a5a4a">[PAUSE — let them respond]</em><br><br>';
+    s += '"Your concentration score came back at '+v(concScore)+' out of 100, putting you in the '+v(scoreTier)+' range. '+v(corrPct+'%')+' of your portfolio is in correlated assets — most investors don\'t realise how much moves together until they see the numbers."<br><br>';
+    s += '"<strong>Was the score roughly what you expected, or did anything surprise you?</strong>"';
+  } else if(type==="LAX_QUIZ") {
+    s += '"Hi '+v(fn)+', this is '+v("[Your Name]")+' from <strong>London Art Exchange</strong>. You completed our Art Investor Readiness Assessment recently and I wanted to touch base — your results highlighted a few things worth discussing."<br><br>';
+    s += '<em style="color:#6a5a4a">[PAUSE]</em><br><br>';
+    s += '"Your overall readiness score was '+v(quizScore)+' out of 100. The biggest gap was '+v(quizGap)+' at '+v(gapScore)+'. That\'s very common — most investors we speak to have a similar pattern."<br><br>';
+    s += '"<strong>What prompted you to take the assessment? Was there something specific you were looking into?</strong>"';
+  } else if(type==="LAX_OPPLIST") {
+    s += '"Hi '+v(fn)+', this is '+v("[Your Name]")+' from <strong>London Art Exchange</strong>. You downloaded our Art Investment Briefing recently — the one covering three artists our advisory team is currently watching. I wanted to follow up and see if any of them caught your eye."<br><br>';
+    s += '<em style="color:#6a5a4a">[PAUSE]</em><br><br>';
+    s += '"Was there a specific artist that interested you? Or were you more broadly exploring what art investment looks like?"';
+  } else if(type==="II_ASSESSMENT") {
+    s += '"Hi '+v(fn)+', this is '+v("[Your Name]")+'. You were referred to us by <strong>Invest Intellect</strong>. You completed their Portfolio Blind Spot Assessment and they flagged your results as something worth a specialist conversation."<br><br>';
+    s += '<em style="color:#6a5a4a">[PAUSE]</em><br><br>';
+    s += '"Your results showed that '+v(blindSpot)+' is your biggest gap right now. Does that resonate with you?"<br><br>';
+    s += '"I specialise in art as a portfolio allocation. Based on your answers there may be a fit worth exploring — <strong>can I walk you through what that looks like?</strong>"';
+  } else if(type==="II_MASTERCLASS"||type==="II_ARTICLE"||type==="II_ADVERTORIAL") {
+    var what = type==="II_MASTERCLASS" ? "watched their masterclass" : "downloaded their Alternative Asset Allocation Report";
+    s += '"Hi '+v(fn)+', this is '+v("[Your Name]")+'. You were referred to us by <strong>Invest Intellect</strong> — you '+what+' recently and they flagged you as someone who might benefit from a specialist conversation."<br><br>';
+    s += '<em style="color:#6a5a4a">[PAUSE]</em><br><br>';
+    s += '"I specialise in art as a portfolio allocation. I\'m not here to sell you anything today — I just wanted to understand what prompted your interest in alternative assets."<br><br>';
+    s += '"<strong>What was it about the '+(type==="II_MASTERCLASS"?"masterclass":"report")+' that caught your attention?</strong>"';
+  } else {
+    s = '<div class="no-script">⚠ Script not determined.<br><br>The Tag or Funnel Entry Page field is empty or unrecognised on this lead.<br><br>Check those two fields and update them to match the expected values.</div>';
+    return s;
+  }
+  s += '</div>';
+  return s;
+}
+
+function buildDimension(gap) {
+  var plays = {
+    "Market Knowledge":   { col:"#3a6a3a", what:"Low understanding of art as a financial asset.", need:"Education first — data before pitch.", line:'"Your assessment flagged Market Knowledge as your biggest gap. That just means you haven\'t had the chance to see the institutional data behind art as an asset class. Let me share a few numbers that tend to change how investors think about this."', data:"£1.7T global art market · -0.04 correlation with equities · UCL: 10–20% art allocation improves risk-adjusted returns ~20%" },
+    "Portfolio Fit":      { col:"#3a5a6a", what:"Understands art but portfolio doesn't reflect it.", need:"Bridge knowledge to action.", line:'"The question is not whether art belongs in a diversified portfolio — the research answers that. The question is whether your current portfolio reflects what you already know."', data:"" },
+    "Timeline Alignment": { col:"#6a4a1a", what:"Stated timeline may not match art\'s 5–10 year hold.", need:"Honest expectation setting.", line:'"Art is not a quick flip. Investors who see the strongest results plan for 5 to 10 years. If your timeline is shorter, it might not be the right moment."', data:"" },
+    "Action Readiness":   { col:"#6a3a1a", what:"Interested but something is holding them back.", need:"Find and remove the blocker.", line:'"What would need to change for you to feel ready?"', data:"" },
+    "Diversification":    { col:"#3a3a6a", what:"Portfolio heavily concentrated in correlated assets.", need:"Show the correlation risk.", line:'"Art\'s correlation with equities is -0.04 over 60 years. That\'s as close to uncorrelated as you can get."', data:"" },
+    "Tangible Assets":    { col:"#4a3a1a", what:"No physical, asset-backed holdings.", need:"Open the door to tangible assets.", line:'"44% of family office assets now sit outside stocks and bonds. You\'re missing an entire dimension of diversification."', data:"" },
+    "Legacy Planning":    { col:"#3a1a4a", what:"No formalised wealth transfer plan.", need:"Connect art to IHT and estate planning.", line:'"Art is one of very few assets that can qualify for inheritance tax relief while also delivering financial returns."', data:"" },
+    "Access":             { col:"#2a2a4a", what:"Feels excluded from sophisticated opportunities.", need:"Position LAX as the gatekeeper.", line:'"Alternative assets are not well-served by traditional advisers because there\'s no fund commission. That\'s why most investors never hear about it."', data:"" },
+  };
+
+  var s = '<div class="section-label">Dimension Playbook — Gap: ' + (gap||"Not set") + '</div>';
+  var play = plays[gap];
+  if(!play && gap) {
+    for(var k in plays) { if(gap.toLowerCase().includes(k.toLowerCase())) { play=plays[k]; break; } }
+  }
+  if(play) {
+    s += '<div class="script-box" style="border-left-color:'+play.col+'">';
+    s += '<strong style="color:#e8d8a0">What it means:</strong> '+play.what+'<br><br>';
+    s += '<strong style="color:#e8d8a0">What they need:</strong> '+play.need;
+    s += '</div>';
+    s += '<div class="gap-box"><strong>Framing line:</strong><br><br><em>'+play.line+'</em>';
+    if(play.data) s += '<br><br><strong>Key data:</strong> '+play.data;
+    s += '</div>';
+  } else {
+    s += '<div class="no-script">No gap dimension set on this lead, or dimension not in playbook.<br><br>Default: lead with the Portfolio Fit framing.</div>';
+  }
+  return s;
+}
+
+function buildObjections() {
+  var objs = [
+    ['"I\'m not interested"','"I completely understand. I\'m not here to sell you anything. You took the time to complete the assessment and your results flagged something worth a quick conversation. If after two minutes you feel it\'s not relevant, I won\'t take up any more of your time. Fair?"'],
+    ['"I already have a financial adviser"','"We don\'t replace your adviser — we work alongside them. Most financial advisers don\'t cover tangible assets like art because it\'s outside their regulatory scope. We fill a very specific gap."'],
+    ['"Art is not a real investment"','"There\'s a fundamental difference between buying art you like and investing in art for returns. UCL published research showing a 10–20% allocation to blue-chip art enhanced portfolio risk-adjusted returns by approximately 20%. This is not about taste — it\'s about allocation."'],
+    ['"How did you get my number?"','"You submitted your number when you completed the assessment. We mentioned at that point that a specialist would be in touch. If now is not a good time, I\'m happy to schedule a call when it suits you better."'],
+    ['"Send me an email instead"','"Absolutely — before I do, can I ask one quick question? What was it that prompted you to take the assessment? That way I can make sure the email covers what\'s actually relevant to you."'],
+  ];
+  var s = '<div class="section-label">Early Objection Responses — Click to Expand</div>';
+  objs.forEach(function(o,i) {
+    s += '<div class="obj"><div class="obj-q" onclick="toggleObj(\'o'+i+'\')">'+o[0]+'</div>';
+    s += '<div class="obj-a" id="o'+i+'">'+o[1]+'</div></div>';
+  });
+  return s;
+}
+
+function buildChecklist() {
+  var items = [
+    "Check Funnel Entry Page and Source URL fields",
+    "Read individual quiz/assessment answers — not just the scores",
+    "Note Concentration Score and allocation percentages",
+    "Check Action Urgency answer (LAX_Q6 or II_Q9)",
+    "Prepare one data point relevant to their Gap Dimension",
+    "Have the Dimension tab ready to reference during the call",
+  ];
+  var s = '<div class="section-label">Pre-Call Checklist</div><ul class="checklist">';
+  items.forEach(function(i){ s += '<li>'+i+'</li>'; });
+  s += '</ul>';
+  s += '<br><div class="section-label">Strategy Session Structure</div>';
+  s += '<div class="script-box"><strong>Mins 1–5:</strong> Opening. Let them talk. Understand motivation.<br>';
+  s += '<strong>Mins 5–15:</strong> Walk through results. Use Dimension Playbook.<br>';
+  s += '<strong>Mins 15–25:</strong> Present the opportunity.<br>';
+  s += '<strong>Mins 25–30:</strong> "Shall I put together a shortlist aligned to your timeline, budget, and goals?"</div>';
+  return s;
+}
+
+function switchTab(el, name) {
+  document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); });
+  document.querySelectorAll(".tab-body > div").forEach(function(t){ t.style.display="none"; });
+  el.classList.add("active");
+  document.getElementById("tab-"+name).style.display = "block";
+}
+
+function toggleObj(id) {
+  var el = document.getElementById(id);
+  el.classList.toggle("open");
+}
+</script>
+</body>
+</html>
