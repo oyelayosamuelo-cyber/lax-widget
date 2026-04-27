@@ -175,7 +175,7 @@ function renderPanel(lead) {
 
   html += '<div class="tab-body">';
   html += '<div id="tab-opening">'                          + buildOpening(scriptType,fn,quizScore,quizGap,gapScore,concScore,scoreTier,corrPct,blindSpot) + "</div>";
-  html += '<div id="tab-dimension"   style="display:none">' + buildDimension(quizGap || blindSpot) + "</div>";
+  html += '<div id="tab-dimension"   style="display:none">' + buildDimension(quizGap || blindSpot, fn) + "</div>";
   html += '<div id="tab-objections"  style="display:none">' + buildObjections() + "</div>";
   if (isBooked) html += '<div id="tab-checklist" style="display:none">' + buildChecklist() + "</div>";
   html += "</div>";
@@ -206,7 +206,7 @@ function buildOpening(type,fn,quizScore,quizGap,gapScore,concScore,scoreTier,cor
   return s;
 }
 
-function buildDimension(gap) {
+function buildDimension(gap, fn) {
   var plays = {
     "Market Knowledge":   { col:"#3a6a3a", what:"Low understanding of art as a financial asset.", need:"Education first — data before pitch.", line:'"Your assessment flagged Market Knowledge as your biggest gap. Let me share a few numbers that tend to change how investors think about this."', data:"£1.7T global art market · -0.04 correlation with equities · UCL: 10–20% art allocation improves risk-adjusted returns ~20%" },
     "Portfolio Fit":      { col:"#3a5a6a", what:"Understands art but portfolio doesn\'t reflect it.", need:"Bridge knowledge to action.", line:'"The question is not whether art belongs in a diversified portfolio — the research answers that. The question is whether your portfolio reflects what you already know."', data:"" },
