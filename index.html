@@ -217,16 +217,20 @@ function buildDimension(gap) {
     "Legacy Planning":    { col:"#3a1a4a", what:"No formalised wealth transfer plan.", need:"Connect art to IHT and estate planning.", line:'"Art can qualify for inheritance tax relief while delivering financial returns."', data:"" },
     "Access":             { col:"#2a2a4a", what:"Feels excluded from sophisticated opportunities.", need:"Position LAX as the gatekeeper.", line:'"Alternative assets aren\'t well-served by traditional advisers because there\'s no fund commission. That\'s why most investors never hear about it."', data:"" }
   };
-  var s = '<div class="section-label">Dimension Playbook — Gap: ' + (gap || "Not set") + "</div>";
+  var displayGap = gap || "Not set";
+  var leadNameForGap = fn || "this lead";
+  var s = '<div class="section-label">Dimension Playbook — Gap: ' + displayGap + "</div>";
   var play = plays[gap];
   if (!play && gap) { for (var k in plays) { if (gap.toLowerCase().includes(k.toLowerCase())) { play = plays[k]; break; } } }
+if (!play) {
+    s += '<div class="no-script">No gap dimension set for <strong>' + leadNameForGap + '</strong>.</div>';
+    return s;
+  }
   if (play) {
-    s += '<div class="script-box" style="border-left-color:' + play.col + '"><strong style="color:#e8d8a0">What it means:</strong> ' + play.what + "<br><br><strong style=\"color:#e8d8a0\">What they need:</strong> " + play.need + "</div>";
+    s += '<div class="script-box" style="border-left-color:' + play.col + '"><strong style="color:#5a3a0a">What it means:</strong> ' + play.what + "<br><br><strong style=\"color:#5a3a0a\">What they need:</strong> " + play.need + "</div>";
     s += '<div class="gap-box"><strong>Framing line:</strong><br><br><em>' + play.line + "</em>";
     if (play.data) s += "<br><br><strong>Key data:</strong> " + play.data;
     s += "</div>";
-  } else {
-    s += '<div class="no-script">No gap dimension set, or not in playbook.<br>Default: lead with Portfolio Fit framing.</div>';
   }
   return s;
 }
