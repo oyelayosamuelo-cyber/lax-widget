@@ -93,10 +93,10 @@ function initWidget() {
 
 ZOHO.embeddedApp.on("PageLoad", function(data) {
   try {
-    var recordId = data.EntityId;
-    var entity   = data.Entity || "Leads";
+    var recordId = data.EntityId || data.ID || data.id;
+    var entity   = "Leads";
     if (!recordId) { showError("No record ID. Raw data: " + JSON.stringify(data)); return; }
-    ZOHO.CRM.API.getRecord({ Entity: entity, RecordID: recordId })
+    ZOHO.CRM.API.getRecord({ Entity: "Leads", RecordID: recordId.toString() })
       .then(function(res) {
         if (res && res.data && res.data.length > 0) {
           renderPanel(res.data[0]);
