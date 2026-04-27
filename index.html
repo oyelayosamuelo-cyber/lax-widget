@@ -112,7 +112,7 @@ ZOHO.embeddedApp.init();
 function v(val) { return '<span class="val">' + (val || "—") + "</span>"; }
 
 function renderPanel(lead) {
-  var fn        = g(lead,"First_Name") || "this lead";
+  var fn        = (g(lead,"First_Name") + " " + g(lead,"Last_Name")).trim() || "this lead";
   var tag       = g(lead,"Tag").toLowerCase();
   var page      = g(lead,"Funnel_Entry_Page").toLowerCase();
   var quizScore = g(lead,"Quiz_Composite_Score");
