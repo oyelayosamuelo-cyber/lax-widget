@@ -132,15 +132,25 @@ function renderPanel(lead) {
   var isII     = tag.includes("tof_") || (tag.includes("quiz_complete") && !tag.includes("lax_quiz"));
 
   var scriptType = "UNKNOWN";
-  if      (isBooked)                                                        scriptType = "BOOKED_SESSION";
-  else if (page.includes("go.start.thelax.art/score")   || page.includes("/score")  || tag.includes("lax_calculator"))  scriptType = "LAX_SCORER";
-  else if (page.includes("go.start.thelax.art/quiz")    || page.includes("/quiz")   || tag.includes("lax_quiz"))         scriptType = "LAX_QUIZ";
-  else if (page.includes("go.start.thelax.art/opportunities") || page.includes("/opportunities") || tag.includes("llax_opplist")) scriptType = "LAX_OPPLIST";
-  else if (page.includes("investintellect.co.uk/article-2") || page.includes("investintellect.co.uk/advertorial-2") || page.includes("investintellect.co.uk/masterclass-2") || page.includes("investintellect.co.uk/article") || page.includes("investintellect.co.uk/advertorial") || page.includes("investintellect.co.uk/masterclass")) scriptType = "II_OUTBOUND";
-  else if (tag.includes("quiz_complete") && isII)                           scriptType = "II_ASSESSMENT";
-  else if (tag.includes("tof_masterclass"))                                 scriptType = "II_MASTERCLASS";
-  else if (tag.includes("tof_article"))                                     scriptType = "II_ARTICLE";
-  else if (tag.includes("tof_advertorial"))                                 scriptType = "II_ADVERTORIAL";
+  if (isBooked) {
+    scriptType = "BOOKED_SESSION";
+  } else if (page.includes("go.start.thelax.art/score") || page.includes("/score") || tag.includes("lax_calculator")) {
+    scriptType = "LAX_SCORER";
+  } else if (page.includes("go.start.thelax.art/quiz") || page.includes("/quiz") || tag.includes("lax_quiz")) {
+    scriptType = "LAX_QUIZ";
+  } else if (page.includes("go.start.thelax.art/opportunities") || page.includes("/opportunities") || tag.includes("llax_opplist")) {
+    scriptType = "LAX_OPPLIST";
+  } else if (page.includes("investintellect.co.uk/article") || page.includes("investintellect.co.uk/advertorial") || page.includes("investintellect.co.uk/masterclass")) {
+    scriptType = "II_OUTBOUND";
+  } else if (tag.includes("tof_article") || tag.includes("tof_advertorial") || tag.includes("tof_masterclass")) {
+    scriptType = "II_OUTBOUND";
+  } else if (tag.includes("quiz_complete") && isII) {
+    scriptType = "II_ASSESSMENT";
+  } else if (tag.includes("lax_quiz")) {
+    scriptType = "LAX_QUIZ";
+  } else if (tag.includes("lax_")) {
+    scriptType = "LAX_SCORER";
+  }
 
   var urgencyAnswer = isLAX ? laxQ6 : iiQ9;
   var urgency = "COOL";
